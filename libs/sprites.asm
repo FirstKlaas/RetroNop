@@ -1,0 +1,7 @@
+sprites: {
+
+    update_position: {
+        
+    }
+
+}
