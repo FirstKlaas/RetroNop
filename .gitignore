@@ -4,3 +4,5 @@
 *.dbg
 *.prg
 *.vs
+settings.json
+
