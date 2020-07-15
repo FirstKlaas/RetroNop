@@ -1,3 +1,6 @@
 *.sym
 *.d64
 *.xcf
+*.dbg
+*.prg
+*.vs
