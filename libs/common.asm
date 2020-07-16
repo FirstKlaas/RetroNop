@@ -1,8 +1,9 @@
-common: {
 
-    deactivate_basic:
-        lda #54
-        sta $0001
-        rts
-    
+.macro DeactivateBasic() {
+    lda #54
+    sta $0001
+}    
+
+.macro ClearScreen() {
+    jsr $e544 // Clear Screen
 }

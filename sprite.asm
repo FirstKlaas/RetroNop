@@ -10,11 +10,18 @@ BasicUpstart2(start)
 #import "libs/common.asm"
 
 start:
-    jsr $e544
-    jsr common.deactivate_basic
+    ClearScreen()
+    DeactivateBasic()
     SetBorderColor(COLOR.BLACK)
     SetBackgroundColor(COLOR.BLACK)
     
+    /*********************************
+     Initialisiere den Spritepointer.
+     Es wird berechnet, bei welchem
+     64 Byte Block das Sprite beginnt.
+     Dazu wird die Adresse des Sprites
+     durch 64 geteilt.
+     ********************************/
     lda #<sprite01                     //LSB der Spritedaten holen
     sta calc16Bit                      //im 'Hilfsregister' speichern
     lda #>sprite01                     //MSB auch
@@ -26,12 +33,17 @@ loop:
     dex                                //Schleifenzähler verringern
     bne loop                           //wenn nicht 0, nochmal
     
-    ldx calc16Bit                      //Im LSB des 'Hilfsregisters' steht der 64-Byte-Block
-    stx SPRITE0PTR                     //In der zuständigen Speicherstelle ablegen
-    stx sprite01block
+    ldx #0
+    lda calc16Bit                      //Im LSB des 'Hilfsregisters' steht der 64-Byte-Block
+    sta SPRITE0PTR                     //In der zuständigen Speicherstelle ablegen
+    sta sprite01block
+
+    adc #4
+    sta SPRITE1PTR
+    sta enemies.startblock,x
     
     //*** Weitere Sourcezeilen ab hier einfügen...
-    lda #%00000000                      //Keine Vergrößerung gewünscht
+    lda #%00000010                      //Keine Vergrößerung gewünscht
     sta VIC.SPRITEDOUBLEHEIGHT          //doppelte Höhe zurücksetzen
     sta VIC.SPRITEDOUBLEWIDTH           //doppelte Breite zurücksetzen
     
@@ -46,16 +58,20 @@ loop:
 
     lda #COLOR.PURPLE                   //Farbe für
     sta VIC.SPRITE0COLOR                //Sprite-0 (hat nur eine, da Hi-Res!)
- 
+    lda #COLOR.GREEN
+    sta VIC.SPRITE1COLOR                //Sprite-0 (hat nur eine, da Hi-Res!)
+    
     ldx #$00                            //Zur Sicherheit das höchste
     stx VIC.SPRITESMAXX                 //Bit für die X-Position löschen
     ldx #$20                            //X-Pos für
     stx VIC.SPRITE0X                    //Sprite-0
+    stx VIC.SPRITE1X                    //Sprite-0
     
     ldy #$80                            //Y-Position
     sty VIC.SPRITE0Y                    //für Sprite-0
-
-    lda #%00000001                      //nur Sprite-0
+    sty VIC.SPRITE1Y                    //für Sprite-0
+    
+    lda #%00000011                      //nur Sprite-0
     sta VIC.SPRITEACTIV                 //aktivieren, alle anderen ausblenden
 
 
@@ -85,6 +101,28 @@ animationdata: {
         .byte $04, $04
 }
 
+enemies: {
+    count:
+        .byte $01
+
+    startblock:
+        .byte $00
+
+    currentblock:
+        .byte $00
+
+    delay:
+        .byte $05
+
+    delay_index:
+        .byte $05
+}
+
+update_sprite: {
+    ldx #enemies.count
+}
+
+
 nextsprite: {
     // REG00 (in Zeropage) zeigt auf animationdata.sp0
     
@@ -96,7 +134,7 @@ nextsprite: {
     dey                       // Decrease Framenr in sprite set
     bne next                  // If 0 start again
     // Lade die anzahl der Frames fuer dieses Spriteset
-    // In REG00 und REG01 ist die Afdresse des aktuellen animadtiondata Blocks
+    // In REG00 und REG01 ist die Adresse des aktuellen animationdata Blocks
     // abgelegt.
     ldy #0                  
     lda (REG00),y
@@ -117,7 +155,6 @@ next:
     inx
     stx $d000
     rts
-
 }
 
 //*** Hilfsregister für 16-Bit Operationen

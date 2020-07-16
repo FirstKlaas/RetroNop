@@ -1,0 +1,15 @@
+parsing
+flex pass 1
+flex pass 2
+flex pass 3
+Output pass
+Writing prg file: sprite.prg
+
+Memory Map
+----------
+Default-segment:
+  $0801-$080c Basic
+  $080e-$08cd Basic End
+  $0940-$0a7f Sprite Data
+
+Writing Symbol file: sprite.sym

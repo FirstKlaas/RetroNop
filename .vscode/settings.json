@@ -1,0 +1,5 @@
+{
+    "kickass-c64.javaBin": "/usr/bin/java",
+    "kickass-c64.viceBin": "/usr/bin/x64",
+    "kickass-c64.kickAssJar": "/home/klaas/Dokumente/c64/KickAssembler/KickAss.jar"
+}
